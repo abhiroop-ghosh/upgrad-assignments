@@ -51,11 +51,8 @@ public class LabRequestController {
     @PreAuthorize("hasAnyRole('TESTER')")
     public List<TestRequest> getForTests()  {
 
-
+       // Return all tests which are in the INITIATED status
        return testRequestQueryService.findBy(RequestStatus.INITIATED);
-
-
-
 
     }
 
@@ -63,14 +60,10 @@ public class LabRequestController {
     @PreAuthorize("hasAnyRole('TESTER')")
     public List<TestRequest> getForTester()  {
 
-        // Implement This Method
-
-        // Create an object of User class and store the current logged in user first
-        //Implement this method to return the list of test requests assigned to current tester(make use of the above created User object)
-        //Make use of the findByTester() method from testRequestQueryService class
-        // For reference check the method getForTests() method from LabRequestController class
-
+        //Get user details from the service
         User tester =userLoggedInService.getLoggedInUser();
+
+        //Return the lists of tests associated with the logged in user
         return testRequestQueryService.findByTester(tester);
 
     }
@@ -80,11 +73,11 @@ public class LabRequestController {
     @PutMapping("/assign/{id}")
     public TestRequest assignForLabTest(@PathVariable Long id) {
 
-
-
+        //Get user details from the service
         User tester =userLoggedInService.getLoggedInUser();
 
-      return   testRequestUpdateService.assignForLabTest(id,tester);
+        //Assign the test with id to the logged in tester
+        return testRequestUpdateService.assignForLabTest(id,tester);
     }
 
     @PreAuthorize("hasAnyRole('TESTER')")

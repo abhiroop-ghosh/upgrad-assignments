@@ -50,14 +50,7 @@ public class ConsultationController {
     @PreAuthorize("hasAnyRole('DOCTOR')")
     public List<TestRequest> getForConsultations()  {
 
-        // Implement this method
-
-
-        //Implement this method to get the list of test requests having status as 'LAB_TEST_COMPLETED'
-        // make use of the findBy() method from testRequestQueryService class
-        //return the result
-        // For reference check the method getForTests() method from LabRequestController class
-
+        //return the list of test request which are in the completed status
         return testRequestQueryService.findBy(RequestStatus.LAB_TEST_COMPLETED);
     }
 
@@ -65,14 +58,10 @@ public class ConsultationController {
     @PreAuthorize("hasAnyRole('DOCTOR')")
     public List<TestRequest> getForDoctor()  {
 
-        //Implement this method
-
-        // Create an object of User class and store the current logged in user first
-        //Implement this method to return the list of test requests assigned to current doctor(make use of the above created User object)
-        //Make use of the findByDoctor() method from testRequestQueryService class to get the list
-        // For reference check the method getForTests() method from LabRequestController class
-
+        // Get user details from the service
         User doctor = userLoggedInService.getLoggedInUser();
+
+        //return all the tests associated with the doctor
         return testRequestQueryService.findByDoctor(doctor);
 
     }
@@ -83,20 +72,18 @@ public class ConsultationController {
     @PutMapping("/assign/{id}")
     public TestRequest assignForConsultation(@PathVariable Long id) {
 
-        // Implement this method
-
-        // Implement this method to assign a particular test request to the current doctor(logged in user)
-        //Create an object of User class and get the current logged in user
-        //Create an object of TestRequest class and use the assignForConsultation() method of testRequestUpdateService to assign the particular id to the current user
-        // return the above created object
-        // For reference check the method assignForLabTest() method from LabRequestController class
         try {
-
+            // Get user details from the service
             User doctor = userLoggedInService.getLoggedInUser();
+
+            // Assign the test request with the input id to the logged in user
             TestRequest testRequest =  testRequestUpdateService.assignForConsultation(id, doctor);
+
+            //return the test request
             return testRequest;
 
         }catch (AppException e) {
+            // The system throws app exception if the id is invalid or the test is not in the LAB_TEST_COMPLETED status
             throw asBadRequest(e.getMessage());
         }
     }
@@ -107,20 +94,15 @@ public class ConsultationController {
     @PutMapping("/update/{id}")
     public TestRequest updateConsultation(@PathVariable Long id,@RequestBody CreateConsultationRequest testResult) {
 
-        // Implement this method
-
-        // Implement this method to update the result of the current test request id with test doctor comments
-        // Create an object of the User class to get the logged in user
-        // Create an object of TestRequest class and make use of updateConsultation() method from testRequestUpdateService class
-        //to update the current test request id with the testResult details by the current user(object created)
-        // For reference check the method updateLabTest() method from LabRequestController class
-
         try {
-
+            // Get user details from the service
             User doctor = userLoggedInService.getLoggedInUser();
-            TestRequest testRequest = testRequestUpdateService.updateConsultation(id,testResult,doctor);
-            return testRequest;
 
+            // Update the test status obtained by the id to completed
+            TestRequest testRequest = testRequestUpdateService.updateConsultation(id,testResult,doctor);
+
+            //return the test request
+            return testRequest;
 
         } catch (ConstraintViolationException e) {
             throw asConstraintViolation(e);
